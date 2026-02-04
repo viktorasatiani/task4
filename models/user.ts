@@ -10,6 +10,16 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    isBlocked: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
   },
   { timestamps: true },
 );

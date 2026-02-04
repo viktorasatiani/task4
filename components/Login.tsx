@@ -1,60 +1,15 @@
-import { cn } from "@/lib/utils";
+import LogInForm from "./forms/LogInForm";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-
-interface LoginProps {
-  heading?: string;
-
-  buttonText?: string;
-  signupText?: string;
-  signupUrl?: string;
-  className?: string;
-}
-
-const Login = ({
-  heading = "Login",
-  buttonText = "Login",
-  signupText = "Need an account?",
-  signupUrl = "/signup",
-  className,
-}: LoginProps) => {
+export function Login() {
   return (
-    <section className={cn("h-screen bg-background", className)}>
+    <section className="h-screen bg-background">
       <div className="flex h-full items-center justify-center">
         <div className="flex flex-col items-center gap-6 lg:justify-start">
-          <div className="flex w-full max-w-sm min-w-sm flex-col items-center gap-y-4 px-6 py-12">
-            {heading && <h1 className="text-2xl font-semibold">{heading}</h1>}
-            <div className="flex w-full flex-col gap-2">
-              <Label>Email</Label>
-              <Input
-                type="email"
-                placeholder="Email"
-                className="text-sm"
-                required
-              />
-            </div>
-            <div className="flex w-full flex-col gap-2">
-              <Label>Password</Label>
-              <Input
-                type="password"
-                placeholder="Password"
-                className="text-sm"
-                required
-              />
-            </div>
-            <Button
-              type="submit"
-              className="w-full"
-            >
-              {buttonText}
-            </Button>
-          </div>
+          <LogInForm />
           <div className="flex justify-center gap-1 text-sm text-muted-foreground">
-            <p>{signupText}</p>
+            <p>Need an account?</p>
             <a
-              href={signupUrl}
+              href={"/signup"}
               className="font-medium text-primary hover:underline"
             >
               Sign up
@@ -64,6 +19,4 @@ const Login = ({
       </div>
     </section>
   );
-};
-
-export { Login };
+}

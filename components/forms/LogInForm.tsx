@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { signIn } from "next-auth/react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,66 +9,41 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { toast, ToastContainer } from "react-toastify";
 
-const SignUpFormSchema = z.object({
+const LogInFormSchema = z.object({
   email: z.email(),
   password: z.string().min(1, "password is required"),
 });
 
-export default function SignUpForm() {
-  const registered = () => toast("User Has Been Registered Successfully!");
-  const alreadyExists = () => toast("User Already Exists!");
-  const failedRegistration = () => toast("User Registration Failed!");
-  const errorRegistering = () => toast("Error During Registration!");
+export default function LogInForm() {
+  const notify = () => toast("Logged in successfully!");
+
   const router = useRouter();
-  const form = useForm<z.infer<typeof SignUpFormSchema>>({
-    resolver: zodResolver(SignUpFormSchema),
+  const form = useForm<z.infer<typeof LogInFormSchema>>({
+    resolver: zodResolver(LogInFormSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  async function onSubmit(data: z.infer<typeof SignUpFormSchema>) {
+  async function onSubmit(data: z.infer<typeof LogInFormSchema>) {
     // Do something with the form values.
 
     try {
-      const resUserExists = await fetch("api/userExists", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: data.email }),
+      const res = await signIn("credentials", {
+        redirect: false,
+        email: data.email,
+        password: data.password,
       });
 
-      const { user } = await resUserExists.json();
-
-      if (user) {
-        form.reset();
-        alreadyExists();
-        return;
-      }
-
-      const res = await fetch("api/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: data.email,
-          password: data.password,
-        }),
-      });
-
-      if (res.ok) {
-        registered();
-        router.push("/login");
+      if (res?.ok) {
+        notify();
+        router.push("/");
       } else {
-        console.log("User registration failed.", res);
-        failedRegistration();
+        toast("Invalid email or password, ether user is blocked!");
       }
     } catch (error) {
-      console.log("Error during registration: ", error);
-      errorRegistering();
+      console.log("Error during login: ", error);
     }
   }
 
@@ -77,7 +53,7 @@ export default function SignUpForm() {
       className="flex w-full max-w-sm min-w-sm flex-col items-center gap-y-4 rounded-md border border-muted bg-background px-6 py-8 shadow-md"
     >
       <ToastContainer />
-      <h1 className="text-xl font-semibold">Signup</h1>
+      <h1 className="text-xl font-semibold">Login</h1>
       <div className="flex w-full flex-col gap-2">
         <Label>Email</Label>
         <Input
@@ -102,7 +78,7 @@ export default function SignUpForm() {
         type="submit"
         className="w-full"
       >
-        Create Account
+        Log In
       </Button>
     </form>
   );
