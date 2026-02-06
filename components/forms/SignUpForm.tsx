@@ -75,9 +75,9 @@ export default function SignUpForm() {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              service_id: "service_099ab1t",
-              template_id: "template_sodpisi",
-              user_id: "-gYlecsHHdM6Vdgkq",
+              service_id: process.env.SERVICE_ID!,
+              template_id: process.env.TEMPLATE_ID!,
+              user_id: process.env.USER_ID!,
               template_params: {
                 from_email: "viktorasatiani77@gmail.com",
                 company: "ACME",
