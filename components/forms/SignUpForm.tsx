@@ -67,7 +67,7 @@ export default function SignUpForm() {
       });
 
       if (res.ok) {
-        const emailResponse = await fetch("/api/send-verification-email", {
+        const emailResponse = await fetch("/api/verify", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
