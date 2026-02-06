@@ -47,10 +47,9 @@ export const authOptions = {
         }
       },
     }),
-   
   ],
   callbacks: {
-    async signIn({ user }: { user: UserType}) {
+    async signIn({ user }: { user: UserType }) {
       await connectMongoDB();
 
       const existingUser = await User.findOne({ email: user.email });

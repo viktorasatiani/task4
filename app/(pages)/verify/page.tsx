@@ -1,11 +1,15 @@
-export default function VerifyPage() {
+import { Verify } from "@/components/Verify";
+
+export default async function VerifyPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const email = (await searchParams).email;
+
   return (
     <div>
-      <h1>Verify Your Email</h1>
-      <p>
-        A verification link has been sent to your email address. Please check
-        your inbox and click on the link to verify your account.
-      </p>
+      <Verify email={email as string} />
     </div>
   );
 }

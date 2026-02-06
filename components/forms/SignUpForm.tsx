@@ -11,10 +11,16 @@ import { toast, ToastContainer } from "react-toastify";
 const SignUpFormSchema = z.object({
   email: z.email(),
   password: z.string().min(1, "password is required"),
+  fullName: z.string().min(1, "full name is required"),
 });
 
 export default function SignUpForm() {
-  const registered = () => toast("User Has Been Registered Successfully!");
+  const registered = () =>
+    toast("User Has Been Registered Successfully!", {
+      onClose: () => {
+        router.push("/login");
+      },
+    });
   const alreadyExists = () => toast("User Already Exists!");
   const failedRegistration = () => toast("User Registration Failed!");
   const errorRegistering = () => toast("Error During Registration!");
@@ -24,6 +30,7 @@ export default function SignUpForm() {
     defaultValues: {
       email: "",
       password: "",
+      fullName: "",
     },
   });
 
@@ -55,12 +62,31 @@ export default function SignUpForm() {
         body: JSON.stringify({
           email: data.email,
           password: data.password,
+          fullName: data.fullName,
         }),
       });
 
       if (res.ok) {
-        registered();
-        router.push("/login");
+        const response = await fetch(
+          "https://api.emailjs.com/api/v1.0/email/send",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              service_id: "service_099ab1t",
+              template_id: "template_sodpisi",
+              user_id: "-gYlecsHHdM6Vdgkq",
+              template_params: {
+                from_email: "viktorasatiani77@gmail.com",
+                company: "ACME",
+                email: data.email,
+              },
+            }),
+          },
+        );
+        if (response.ok) registered();
       } else {
         console.log("User registration failed.", res);
         failedRegistration();
@@ -84,6 +110,16 @@ export default function SignUpForm() {
           {...form.register("email")}
           type="email"
           placeholder="Email"
+          className="text-sm"
+          required
+        />
+      </div>
+      <div className="flex w-full flex-col gap-2">
+        <Label>Full Name</Label>
+        <Input
+          {...form.register("fullName")}
+          type="text"
+          placeholder="Full Name"
           className="text-sm"
           required
         />
