@@ -5,8 +5,8 @@ import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 import { toast, ToastContainer } from "react-toastify";
+import * as z from "zod";
 
 const SignUpFormSchema = z.object({
   email: z.email(),
@@ -67,26 +67,14 @@ export default function SignUpForm() {
       });
 
       if (res.ok) {
-        const response = await fetch(
-          "https://api.emailjs.com/api/v1.0/email/send",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              service_id: process.env.SERVICE_ID!,
-              template_id: process.env.TEMPLATE_ID!,
-              user_id: process.env.USER_ID!,
-              template_params: {
-                from_email: "viktorasatiani77@gmail.com",
-                company: "ACME",
-                email: data.email,
-              },
-            }),
+        const emailResponse = await fetch("/api/send-verification-email", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
-        if (response.ok) registered();
+          body: JSON.stringify({ email: data.email }),
+        });
+        if (emailResponse.ok) registered();
       } else {
         console.log("User registration failed.", res);
         failedRegistration();
