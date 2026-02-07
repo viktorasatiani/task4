@@ -1,4 +1,9 @@
 "use client";
+import {
+  checkUserExistsApi,
+  signUpApi,
+  sendVerificationEmailApi,
+} from "@/lib/auth-api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,16 +20,22 @@ const SignUpFormSchema = z.object({
 });
 
 export default function SignUpForm() {
-  const registered = () =>
-    toast("User Has Been Registered Successfully!", {
+  const router = useRouter();
+  const showAuthToast = (
+    message: string,
+    type: "success" | "error" | "info",
+    redirectToLogin: boolean = false,
+  ) => {
+    toast(message, {
+      type: type,
       onClose: () => {
-        router.push("/login");
+        if (redirectToLogin) {
+          router.push("/login");
+        }
       },
     });
-  const alreadyExists = () => toast("User Already Exists!");
-  const failedRegistration = () => toast("User Registration Failed!");
-  const errorRegistering = () => toast("Error During Registration!");
-  const router = useRouter();
+  };
+
   const form = useForm<z.infer<typeof SignUpFormSchema>>({
     resolver: zodResolver(SignUpFormSchema),
     defaultValues: {
@@ -38,62 +49,35 @@ export default function SignUpForm() {
     // Do something with the form values.
 
     try {
-      const resUserExists = await fetch("api/userExists", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: data.email }),
-      });
-
-      const { user } = await resUserExists.json();
+      const { user } = await checkUserExistsApi(data.email);
 
       if (user) {
         form.reset();
-        alreadyExists();
+        showAuthToast("User Already Exists!", "error");
         return;
       }
 
-      const res = await fetch("api/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: data.email,
-          password: data.password,
-          fullName: data.fullName,
-        }),
+      const res = await signUpApi({
+        email: data.email,
+        password: data.password,
+        fullName: data.fullName,
       });
 
       if (res.ok) {
-        const response = await fetch(
-          "https://api.emailjs.com/api/v1.0/email/send",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              service_id: process.env.NEXT_PUBLIC_SERVICE_ID,
-              template_id: process.env.NEXT_PUBLIC_TEMPLATE_ID,
-              user_id: process.env.NEXT_PUBLIC_USER_ID,
-              template_params: {
-                from_email: "viktorasatiani77@gmail.com",
-                company: "ACME",
-                email: data.email,
-              },
-            }),
-          },
-        );
-        if (response.ok) registered();
+        const emailResponse = await sendVerificationEmailApi(data.email);
+        if (emailResponse.ok)
+          showAuthToast(
+            "User Has Been Registered Successfully!",
+            "success",
+            true,
+          );
       } else {
         console.log("User registration failed.", res);
-        failedRegistration();
+        showAuthToast("User Registration Failed!", "error");
       }
     } catch (error) {
       console.log("Error during registration: ", error);
-      errorRegistering();
+      showAuthToast("Error During Registration!", "error");
     }
   }
 

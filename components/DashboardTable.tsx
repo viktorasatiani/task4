@@ -1,17 +1,14 @@
 "use client";
-import { signOut } from "next-auth/react";
 import { DataTable } from "./ui/data-table";
-import { columns, USER } from "./ui/columnt";
+import { columns, USER } from "./ui/column";
 
 export default function DashboardTable({ users }: { users: USER[] }) {
-  console.log(users, "users from table");
   return (
-    <div>
+    <div className="max-w-200  mx-auto">
       <DataTable
         columns={columns}
         data={users}
       />
-      <button onClick={() => signOut()}>signout</button>
     </div>
   );
 }
