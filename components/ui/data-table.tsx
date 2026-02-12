@@ -89,8 +89,9 @@ export function DataTable<TData extends { _id: string }, TValue>({
       console.log("response from block ", data);
       if (data.success) {
         showToast("User blocked successfully!", "success");
+        setRowSelection({});
       } else {
-        showToast("User is already blocked or not found.", "info");
+        showToast(data.message, "info");
       }
     } catch (error) {
       console.error("Error blocking users:", error);
@@ -102,8 +103,9 @@ export function DataTable<TData extends { _id: string }, TValue>({
       const data = await unblockUsersApi(selectedRowData);
       if (data.success) {
         showToast("User has been Unblocked successfully!", "success");
+        setRowSelection({});
       } else {
-        showToast("User is already unblocked or not found.", "info");
+        showToast(data.message, "info");
       }
     } catch (error) {
       console.error("Error unblocking users:", error);
@@ -115,6 +117,9 @@ export function DataTable<TData extends { _id: string }, TValue>({
       const data = await deleteUsersApi(selectedRowData);
       if (data.success) {
         showToast("user has been deleted succesfully!", "success");
+        setRowSelection({});
+      } else {
+        showToast(data.message, "info");
       }
     } catch (error) {
       showToast(error as string, "error");
@@ -127,8 +132,10 @@ export function DataTable<TData extends { _id: string }, TValue>({
       console.log(data, "data from unverified");
       if (data.success) {
         showToast("Unverified users deleted successfully!", "success");
+        setRowSelection({});
+      } else {
+        showToast(data.message, "info");
       }
-      throw new Error(data.message);
     } catch (error) {
       showToast(error as string, "error");
     }
@@ -147,6 +154,7 @@ export function DataTable<TData extends { _id: string }, TValue>({
         />
         <div className="flex justify-between items-center gap-4">
           <Button
+            disabled={selectedRowData.length <= 0}
             variant="outline"
             size="icon"
             onClick={() => blockUsers()}
@@ -154,6 +162,7 @@ export function DataTable<TData extends { _id: string }, TValue>({
             <LockKeyhole />
           </Button>
           <Button
+            disabled={selectedRowData.length <= 0}
             variant="outline"
             size="icon"
             onClick={() => unblockUsers()}
@@ -161,6 +170,7 @@ export function DataTable<TData extends { _id: string }, TValue>({
             <LockKeyholeOpen />
           </Button>
           <Button
+            disabled={selectedRowData.length <= 0}
             variant="destructive"
             size="icon"
             onClick={() => deleteUsers()}
@@ -168,6 +178,7 @@ export function DataTable<TData extends { _id: string }, TValue>({
             <Trash2 />
           </Button>
           <Button
+            disabled={selectedRowData.length <= 0}
             variant="destructive"
             size="icon"
             onClick={() => deleteUnverified()}
